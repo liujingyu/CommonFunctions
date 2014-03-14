@@ -98,3 +98,34 @@ function getPrefixKeyFromArray($arr, $prefix = 'prefix') {
 
     return $result;
 }
+
+/**
+ * 二维数组去重
+ *
+ * @param $arr
+ *
+ * @return array
+ *
+ * @author liujingyu
+ **/
+
+/**
+ *
+ * $arr = array(
+ *     array('s'=>1, 'name'=>'asdfa'),
+ *     array('s'=>1, 'name'=>'asdfa'),
+ *     array('s'=>1, 'name'=>'asdfa'),
+ * );
+ **/
+
+function array_unique2d($arr) {
+    $result = array();
+    foreach ($arr as $key) {
+        if (!in_array($key, $result)) {
+            array_push($result, $key);
+        }
+    }
+
+    return $result;
+}
+
