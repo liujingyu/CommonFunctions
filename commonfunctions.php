@@ -129,3 +129,106 @@ function array_unique2d($arr) {
     return $result;
 }
 
+/**
+ * 删除网页中的js，css脚本
+ *
+ * @param $str
+ *
+ * @return String
+ *
+ * @author liujingyu
+ **/
+function delScript($str) {
+    $pregfind = array("/<script.*>.*<\/script>/siU", '/on(mousewheel|mouseover|click|load|onload|submit|focus|blur)="[^"]*"/i');
+    $pregreplace = array('', '');
+    $string = preg_replace($pregfind, $pregreplace, $string);
+    $string = preg_replace('/<style[^>]*?>(.*?)<\/style>/si', '', $string); //去除style
+
+    return $string;
+}
+
+/**
+ * 在$haystack中,匹配以$needle开头
+ *
+ * @param $haystack
+ * @param needle
+ *
+ * @return bool
+ *
+ * @author liujingyu
+ **/
+function startsWith($haystack, $needle) {
+    return !strncmp($haystack, $needle, strlen($needle));
+}
+
+/**
+ * 在$haystack中,匹配以$needle结尾
+ *
+ * @param $haystack
+ * @param needle
+ *
+ * @return bool
+ *
+ * @author liujingyu
+ **/
+function endsWith($haystack, $needle) {
+    return Tool::startsWith(strrev($haystack), strrev($needle));
+}
+
+/**
+ * 多空格变单空格
+ *
+ * @param $str
+ *
+ * @return String
+ *
+ * @author liujingyu
+ **/
+function MergeSpaces($str) {
+    return  preg_replace("/\s(?=\s)/", "\\1", $str);
+}
+
+/**
+ * 绝对路径的
+ *
+ * @param $baseurl
+ * @param $relativeurl
+ *
+ * @return String
+ *
+ * @author liujingyu
+ **/
+function urlJoin($baseurl, $relativeurl) {
+    $p1 = parse_url($baseurl);
+    $p2 = parse_url($relativeurl);
+    $r = array_merge($p1, $p2);
+    $spc = array('query', 'fragment', 'path');
+    foreach ($p1 as $k => $v) {
+        if (!isset($p2[$k]) && in_array($k, $spc)) {
+            unset($r[$k]);
+        }
+    }
+    if (isset($r['path']) && !isset($p2['host'])) {
+        if (strpos($relativeurl, '/') !== 0) {
+            $path1 = explode('/', isset($p1['path']) ? $p1['path'] : '');
+            $path2 = explode('/', isset($p2['path']) ? $p2['path'] : '');
+            array_pop($path1);
+            foreach ($path2 as $px) {
+                switch ($px) {
+                case '..':
+                    array_pop($path1);
+                    break;
+                case '.':
+                    # nothing
+                    break;
+                default:
+                    $path1[] = $px;
+                    break;
+                }
+            }
+            $r['path'] = implode( '/', $path1);
+        }
+    }
+    return (isset($r['scheme']) ? $r['scheme'] . '://' : 'http://').(isset($r['user']) ? $r['user'].(isset($r['pass']) ? ':'.$r['pass'] : '').'@' : '').$r['host'].(isset($r['port']) ? ':' . $r['port'] : '').'/'.ltrim((isset($r['path']) ? $r['path'] : ''), '/').(isset($r['query']) ? '?'.$r['query'] : '').(isset($r['fragment']) ? '#'.$r['fragment'] : '');
+}
+
